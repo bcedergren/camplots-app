@@ -16,7 +16,7 @@ console.log('Environment check:', {
   NODE_ENV: process.env.NODE_ENV,
   PORT: port,
   DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'Not set',
-  JWT_SECRET: process.env.JWT_SECRET ? 'Set' : 'Not set'
+  JWT_SECRET: process.env.JWT_SECRET ? 'Set' : 'Not set',
 });
 
 app.use(cors());
@@ -36,17 +36,17 @@ app.get('/health', async (req, res) => {
     // Import prisma inside the route to avoid startup issues
     const { default: prisma } = await import('./db');
     await prisma.$queryRaw`SELECT 1`;
-    res.json({ 
-      status: 'healthy', 
+    res.json({
+      status: 'healthy',
       database: 'connected',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    res.status(503).json({ 
-      status: 'unhealthy', 
+    res.status(503).json({
+      status: 'unhealthy',
       database: 'disconnected',
       error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 });

@@ -5,13 +5,17 @@ const prisma = new PrismaClient({
 });
 
 // Test database connection
-prisma.$connect()
+prisma
+  .$connect()
   .then(() => {
     console.log('Database connection established successfully');
   })
   .catch((error: unknown) => {
     console.error('Failed to connect to database:', error);
-    console.log('DATABASE_URL status:', process.env.DATABASE_URL ? 'Set' : 'Not set');
+    console.log(
+      'DATABASE_URL status:',
+      process.env.DATABASE_URL ? 'Set' : 'Not set'
+    );
   });
 
 export default prisma;

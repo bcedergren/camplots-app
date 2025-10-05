@@ -2,10 +2,14 @@ services:
   - type: web
     name: camplots-backend
     runtime: node
+    rootDir: packages/backend
     buildCommand: |
-      npm ci --include=dev
-      npm run build --workspace=backend
-    startCommand: npm start --workspace=backend
+      cd ../../
+      npm ci
+      cd packages/backend
+      npm ci
+      npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
