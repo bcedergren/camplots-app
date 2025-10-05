@@ -27,8 +27,102 @@ app.use('/api/v1/hosts', hostRoutes);
 app.use('/api/v1/bookings', bookingRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 
-app.get('/', (req, res) => {
-  res.send('Hello from the backend!');
+app.get('/', async (req, res) => {
+  // Check if setup=true query parameter is present
+  if (req.query.setup === 'true') {
+    try {
+      const { default: prisma } = await import('./db');
+      const bcrypt = require('bcryptjs');
+      
+      // Check if user already exists
+      const existingUser = await prisma.user.findUnique({
+        where: { email: 'test@camplots.com' }
+      });
+      
+      if (existingUser) {
+        return res.json({
+          message: 'Test user already exists!',
+          email: 'test@camplots.com',
+          password: 'password123',
+          status: 'ready for login',
+          instructions: 'You can now login with these credentials'
+        });
+      }
+      
+      // Create the test user directly
+      const testUser = await prisma.user.create({
+        data: {
+          username: 'testuser',
+          email: 'test@camplots.com',
+          passwordHash: await bcrypt.hash('password123', 10),
+          subscriptionType: 'Premium',
+        },
+      });
+      
+      return res.json({
+        message: 'Test user created successfully!',
+        email: 'test@camplots.com',
+        password: 'password123',
+        status: 'ready for login',
+        userId: testUser.userId,
+        instructions: 'You can now login with these credentials'
+      });
+      
+    } catch (error) {
+      return res.status(500).json({
+        error: error instanceof Error ? error.message : 'Unknown error',
+        hint: 'Database tables might not exist yet. Try visiting /?migrate=true first'
+      });
+    }
+  }
+  
+  // Check if migrate=true query parameter is present
+  if (req.query.migrate === 'true') {
+    try {
+      const { execSync } = require('child_process');
+      console.log('Running database migrations...');
+      const output = execSync('npx prisma migrate deploy', {
+        encoding: 'utf8',
+        cwd: process.cwd(),
+      });
+      console.log('Migration output:', output);
+      return res.json({
+        success: true,
+        message: 'Database migrations completed successfully',
+        output: output,
+        nextStep: 'Now visit /?setup=true to create test user',
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+  
+  // Default response with instructions
+  res.send(`
+    <h1>CampLots Backend API</h1>
+    <p>Backend is running successfully!</p>
+    <h2>Setup Instructions:</h2>
+    <ol>
+      <li><strong>Step 1:</strong> <a href="/?migrate=true">Run Database Migration</a></li>
+      <li><strong>Step 2:</strong> <a href="/?setup=true">Create Test User</a></li>
+    </ol>
+    <h2>Test Credentials:</h2>
+    <ul>
+      <li><strong>Email:</strong> test@camplots.com</li>
+      <li><strong>Password:</strong> password123</li>
+    </ul>
+    <h2>API Endpoints:</h2>
+    <ul>
+      <li><a href="/health">Health Check</a></li>
+      <li>POST /api/v1/users/login - Login endpoint</li>
+      <li>POST /api/v1/users/register - Registration endpoint</li>
+    </ul>
+  `);
 });
 
 // Simple test registration without requiring frontend
