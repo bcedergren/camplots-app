@@ -2,12 +2,10 @@ services:
   - type: web
     name: camplots-backend
     runtime: node
-    rootDir: packages/backend
     buildCommand: |
       npm ci
-      npx prisma generate
-      npm run build
-    startCommand: npm start
+      npm run build --workspace=backend
+    startCommand: npm start --workspace=backend
     envVars:
       - key: NODE_ENV
         value: production
