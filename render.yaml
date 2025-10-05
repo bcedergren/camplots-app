@@ -3,7 +3,7 @@ services:
     name: camplots-backend
     runtime: node
     buildCommand: |
-      npm ci
+      npm ci --include=dev
       npm run build --workspace=backend
     startCommand: npm start --workspace=backend
     envVars:
