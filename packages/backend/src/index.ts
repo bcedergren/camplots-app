@@ -31,6 +31,52 @@ app.get('/', (req, res) => {
   res.send('Hello from the backend!');
 });
 
+// Simple test registration without requiring frontend
+app.get('/create-test-user', async (req, res) => {
+  try {
+    const { default: prisma } = await import('./db');
+    const bcrypt = require('bcryptjs');
+    
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: 'test@camplots.com' }
+    });
+    
+    if (existingUser) {
+      return res.json({
+        message: 'Test user already exists!',
+        email: 'test@camplots.com',
+        password: 'password123',
+        status: 'ready for login'
+      });
+    }
+    
+    // Create the test user directly
+    const testUser = await prisma.user.create({
+      data: {
+        username: 'testuser',
+        email: 'test@camplots.com',
+        passwordHash: await bcrypt.hash('password123', 10),
+        subscriptionType: 'Premium',
+      },
+    });
+    
+    res.json({
+      message: 'Test user created successfully!',
+      email: 'test@camplots.com',
+      password: 'password123',
+      status: 'ready for login',
+      userId: testUser.userId
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Unknown error',
+      hint: 'Database tables might not exist yet'
+    });
+  }
+});
+
 app.get('/health', async (req, res) => {
   try {
     // Import prisma inside the route to avoid startup issues
@@ -80,9 +126,9 @@ app.get('/setup/migrate', async (req, res) => {
   try {
     const { execSync } = require('child_process');
     console.log('Running database migrations...');
-    const output = execSync('npx prisma migrate deploy', { 
+    const output = execSync('npx prisma migrate deploy', {
       encoding: 'utf8',
-      cwd: process.cwd()
+      cwd: process.cwd(),
     });
     console.log('Migration output:', output);
     res.json({
@@ -105,14 +151,14 @@ app.get('/setup/seed', async (req, res) => {
   try {
     const { default: prisma } = await import('./db');
     const bcrypt = require('bcryptjs');
-    
+
     console.log('Seeding database...');
-    
+
     // Check if test user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email: 'test@camplots.com' }
+      where: { email: 'test@camplots.com' },
     });
-    
+
     if (existingUser) {
       return res.json({
         success: true,
@@ -124,7 +170,7 @@ app.get('/setup/seed', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     // Create test user
     const testUser = await prisma.user.create({
       data: {
@@ -134,9 +180,9 @@ app.get('/setup/seed', async (req, res) => {
         subscriptionType: 'Premium',
       },
     });
-    
+
     console.log('Test user created:', testUser.email);
-    
+
     res.json({
       success: true,
       message: 'Database seeded successfully',
