@@ -26,7 +26,12 @@ export const login = async (req: Request, res: Response) => {
     console.log('Login successful for:', req.body.email);
     res.status(200).json({ token, expiresIn });
   } catch (error) {
-    console.log('Login failed for:', req.body.email, 'Error:', (error as Error).message);
+    console.log(
+      'Login failed for:',
+      req.body.email,
+      'Error:',
+      (error as Error).message
+    );
     res.status(400).json({ message: (error as Error).message });
   }
 };

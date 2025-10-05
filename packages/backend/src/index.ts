@@ -76,6 +76,86 @@ app.get('/debug/users', async (req, res) => {
   }
 });
 
+app.post('/setup/migrate', async (req, res) => {
+  try {
+    const { execSync } = require('child_process');
+    console.log('Running database migrations...');
+    const output = execSync('npx prisma migrate deploy', { 
+      encoding: 'utf8',
+      cwd: process.cwd()
+    });
+    console.log('Migration output:', output);
+    res.json({
+      success: true,
+      message: 'Database migrations completed successfully',
+      output: output,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Migration failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+app.post('/setup/seed', async (req, res) => {
+  try {
+    const { default: prisma } = await import('./db');
+    const bcrypt = require('bcryptjs');
+    
+    console.log('Seeding database...');
+    
+    // Check if test user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: 'test@camplots.com' }
+    });
+    
+    if (existingUser) {
+      return res.json({
+        success: true,
+        message: 'Test user already exists',
+        user: {
+          email: existingUser.email,
+          username: existingUser.username,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    }
+    
+    // Create test user
+    const testUser = await prisma.user.create({
+      data: {
+        username: 'testuser',
+        email: 'test@camplots.com',
+        passwordHash: await bcrypt.hash('password123', 10),
+        subscriptionType: 'Premium',
+      },
+    });
+    
+    console.log('Test user created:', testUser.email);
+    
+    res.json({
+      success: true,
+      message: 'Database seeded successfully',
+      user: {
+        email: testUser.email,
+        username: testUser.username,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Seeding failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Backend server is running on http://localhost:${port}`);
 });
