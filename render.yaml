@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: camplots-backend
+    runtime: node
+    buildCommand: npm run build
+    startCommand: npm start
+    rootDir: packages/backend
+    envVars:
+      - key: NODE_ENV
+        value: production
