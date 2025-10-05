@@ -84,13 +84,13 @@ camplots-app/
 
    Create `.env` files in the root directory:
 
-   ```env
+   ````env
    # Database
    DATABASE_URL="postgresql://username:password@localhost:5432/camplots"
-   
+
    # JWT Secret (generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))")
    JWT_SECRET="your-generated-secure-jwt-secret-here"
-   
+
    # Frontend API URL (for production)
    NEXT_PUBLIC_API_URL="http://localhost:8000"
    ```4. **Set up the database**
@@ -104,9 +104,9 @@ camplots-app/
 
    # Seed the database (optional)
    npm run seed --workspace=backend
-   ```
+   ````
 
-5. **Start the development servers**
+4. **Start the development servers**
 
    ```bash
    # Start backend (runs on port 8000)
