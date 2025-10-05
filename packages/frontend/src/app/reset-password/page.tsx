@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import apiClient from '@/lib/api';
@@ -11,7 +11,7 @@ interface ResetPasswordFormData {
   confirmPassword: string;
 }
 
-const ResetPasswordPage = () => {
+const ResetPasswordForm = () => {
   const { register, handleSubmit } = useForm<ResetPasswordFormData>();
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -323,6 +323,50 @@ const ResetPasswordPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const ResetPasswordPage = () => {
+  return (
+    <Suspense fallback={
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          paddingTop: '80px',
+          minHeight: '100vh',
+          backgroundColor: '#f7fafc',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            padding: '32px',
+            border: '1px solid #e2e8f0',
+            borderRadius: '8px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            backgroundColor: 'white',
+            width: '400px',
+            maxWidth: '90%',
+            textAlign: 'center',
+          }}
+        >
+          <h1
+            style={{
+              fontSize: '24px',
+              fontWeight: 'bold',
+              color: '#111827',
+            }}
+          >
+            Loading...
+          </h1>
+        </div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   );
 };
 

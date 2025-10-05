@@ -38,7 +38,7 @@ const DashboardPage = () => {
         const userId = 'demo-user-id';
         const response = await apiClient.get(`/bookings?userId=${userId}`);
         setBookings(response.data);
-      } catch (err) {
+      } catch {
         console.log('Using demo data for dashboard');
         setBookings([
           {
