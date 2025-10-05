@@ -87,15 +87,13 @@ camplots-app/
    ```env
    # Database
    DATABASE_URL="postgresql://username:password@localhost:5432/camplots"
-
-   # JWT Secret
-   JWT_SECRET="your-super-secret-jwt-key"
-
+   
+   # JWT Secret (generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))")
+   JWT_SECRET="your-generated-secure-jwt-secret-here"
+   
    # Frontend API URL (for production)
    NEXT_PUBLIC_API_URL="http://localhost:8000"
-   ```
-
-4. **Set up the database**
+   ```4. **Set up the database**
 
    ```bash
    # Generate Prisma client
