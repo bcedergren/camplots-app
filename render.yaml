@@ -2,9 +2,15 @@ services:
   - type: web
     name: camplots-backend
     runtime: node
-    buildCommand: npm run build
-    startCommand: npm start
     rootDir: packages/backend
+    buildCommand: |
+      npm install
+      npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: JWT_SECRET
+        sync: false
+      - key: DATABASE_URL  
+        sync: false
