@@ -76,7 +76,7 @@ app.get('/debug/users', async (req, res) => {
   }
 });
 
-app.post('/setup/migrate', async (req, res) => {
+app.get('/setup/migrate', async (req, res) => {
   try {
     const { execSync } = require('child_process');
     console.log('Running database migrations...');
@@ -101,7 +101,7 @@ app.post('/setup/migrate', async (req, res) => {
   }
 });
 
-app.post('/setup/seed', async (req, res) => {
+app.get('/setup/seed', async (req, res) => {
   try {
     const { default: prisma } = await import('./db');
     const bcrypt = require('bcryptjs');
