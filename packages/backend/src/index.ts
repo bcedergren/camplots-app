@@ -51,6 +51,31 @@ app.get('/health', async (req, res) => {
   }
 });
 
+app.get('/debug/users', async (req, res) => {
+  try {
+    const { default: prisma } = await import('./db');
+    const userCount = await prisma.user.count();
+    const users = await prisma.user.findMany({
+      select: {
+        userId: true,
+        email: true,
+        username: true,
+        createdAt: true,
+      },
+    });
+    res.json({
+      userCount,
+      users,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Backend server is running on http://localhost:${port}`);
 });
