@@ -159,6 +159,70 @@ app.get('/', async (req, res) => {
     }
   }
   
+  // Test login endpoint
+  if (req.query.testLogin === 'true') {
+    try {
+      const { default: prisma } = await import('./db');
+      const bcrypt = require('bcryptjs');
+      const jwt = require('jsonwebtoken');
+      
+      const email = 'test@camplots.com';
+      const password = 'password123';
+      
+      console.log('Testing login for:', email);
+      
+      // Find user
+      const user = await prisma.user.findUnique({ where: { email } });
+      console.log('User found:', !!user);
+      
+      if (!user) {
+        return res.json({
+          step: 'user_lookup',
+          success: false,
+          message: 'User not found',
+          email: email
+        });
+      }
+      
+      // Test password
+      const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+      console.log('Password match:', passwordMatch);
+      
+      if (!passwordMatch) {
+        return res.json({
+          step: 'password_check',
+          success: false,
+          message: 'Password does not match',
+          hashLength: user.passwordHash.length,
+          hashPreview: user.passwordHash.substring(0, 20) + '...'
+        });
+      }
+      
+      // Generate token
+      const token = jwt.sign(
+        { userId: user.userId },
+        process.env.JWT_SECRET || 'your_jwt_secret',
+        { expiresIn: '1h' }
+      );
+      
+      return res.json({
+        step: 'complete',
+        success: true,
+        message: 'Login test successful',
+        userId: user.userId,
+        tokenGenerated: !!token,
+        tokenPreview: token.substring(0, 20) + '...'
+      });
+      
+    } catch (error) {
+      return res.json({
+        step: 'error',
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
   // Check if debug=true query parameter is present
   if (req.query.debug === 'true') {
     try {
@@ -190,12 +254,36 @@ app.get('/', async (req, res) => {
         console.log('User table might not exist yet');
       }
       
+      // Test password if test user exists
+      let passwordTest = null;
+      const testUser = users.find(u => u.email === 'test@camplots.com');
+      if (testUser) {
+        try {
+          // Get full user data with password hash
+          const fullUser = await prisma.user.findUnique({
+            where: { email: 'test@camplots.com' }
+          });
+          if (fullUser) {
+            const bcrypt = require('bcryptjs');
+            const isPasswordMatch = await bcrypt.compare('password123', fullUser.passwordHash);
+            passwordTest = {
+              hashLength: fullUser.passwordHash.length,
+              passwordMatch: isPasswordMatch,
+              hashPreview: fullUser.passwordHash.substring(0, 20) + '...'
+            };
+          }
+        } catch (e) {
+          passwordTest = { error: e instanceof Error ? e.message : 'Unknown error' };
+        }
+      }
+
       return res.json({
         database: 'connected',
         tables: tableCheck,
         userCount: userCount,
         users: users,
         testUserExists: users.some(u => u.email === 'test@camplots.com'),
+        passwordTest: passwordTest,
         environment: {
           NODE_ENV: process.env.NODE_ENV,
           JWT_SECRET: process.env.JWT_SECRET ? 'Set' : 'Not set',
@@ -244,6 +332,7 @@ app.get('/', async (req, res) => {
         <p><strong>Step 1:</strong> <a href="/?migrate=true" class="button">🔧 Run Database Migration</a></p>
         <p><strong>Step 2:</strong> <a href="/?setup=true" class="button">👤 Create Test User</a></p>
         <p><strong>Debug:</strong> <a href="/?debug=true" class="button">🔍 Check Database Status</a></p>
+        <p><strong>Test Login:</strong> <a href="/?testLogin=true" class="button">🔐 Test Login Flow</a></p>
       </div>
       
       <div class="credentials">
