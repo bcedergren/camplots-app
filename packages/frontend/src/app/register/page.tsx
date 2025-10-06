@@ -60,7 +60,7 @@ const RegisterPage = () => {
             fontWeight: 'bold',
             textAlign: 'center',
             marginBottom: '16px',
-            color: '#111827',
+            color: '#000',
           }}
         >
           Register
@@ -72,7 +72,7 @@ const RegisterPage = () => {
               display: 'block',
               marginBottom: '4px',
               fontWeight: '500',
-              color: '#111827',
+              color: '#000',
             }}
           >
             Username
@@ -86,7 +86,7 @@ const RegisterPage = () => {
               border: '1px solid #d1d5db',
               borderRadius: '4px',
               fontSize: '16px',
-              color: '#111827',
+              color: '#000',
             }}
           />
         </div>
@@ -97,14 +97,19 @@ const RegisterPage = () => {
               display: 'block',
               marginBottom: '4px',
               fontWeight: '500',
-              color: '#111827',
+              color: '#000',
             }}
           >
             Account Type
           </label>
           <div style={{ display: 'flex', gap: '12px' }}>
             <label
-              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                color: '#000',
+              }}
             >
               <input
                 type="radio"
@@ -112,10 +117,15 @@ const RegisterPage = () => {
                 {...register('role', { required: true })}
                 style={{ accentColor: '#3182ce' }}
               />
-              User
+              <span style={{ color: '#000' }}>User</span>
             </label>
             <label
-              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                color: '#000',
+              }}
             >
               <input
                 type="radio"
@@ -123,7 +133,7 @@ const RegisterPage = () => {
                 {...register('role', { required: true })}
                 style={{ accentColor: '#3182ce' }}
               />
-              Host
+              <span style={{ color: '#000' }}>Host</span>
             </label>
           </div>
         </div>
@@ -134,7 +144,7 @@ const RegisterPage = () => {
               display: 'block',
               marginBottom: '4px',
               fontWeight: '500',
-              color: '#111827',
+              color: '#000',
             }}
           >
             Email
@@ -148,7 +158,7 @@ const RegisterPage = () => {
               border: '1px solid #d1d5db',
               borderRadius: '4px',
               fontSize: '16px',
-              color: '#111827',
+              color: '#000',
             }}
           />
         </div>
@@ -159,7 +169,7 @@ const RegisterPage = () => {
               display: 'block',
               marginBottom: '4px',
               fontWeight: '500',
-              color: '#111827',
+              color: '#000',
             }}
           >
             Password
@@ -173,7 +183,7 @@ const RegisterPage = () => {
               border: '1px solid #d1d5db',
               borderRadius: '4px',
               fontSize: '16px',
-              color: '#111827',
+              color: '#000',
             }}
           />
         </div>
@@ -200,7 +210,7 @@ const RegisterPage = () => {
             marginTop: '16px',
             textAlign: 'center',
             fontSize: '14px',
-            color: '#6b7280',
+            color: '#000',
           }}
         >
           <p style={{ marginBottom: '8px' }}>
@@ -208,7 +218,7 @@ const RegisterPage = () => {
             <Link
               href="/login"
               style={{
-                color: '#10b981',
+                color: '#000',
                 textDecoration: 'none',
                 fontWeight: '600',
               }}
@@ -225,16 +235,16 @@ const RegisterPage = () => {
           <Link
             href="/"
             style={{
-              color: '#6b7280',
+              color: '#000',
               textDecoration: 'none',
               fontSize: '13px',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#111827';
+              e.currentTarget.style.color = '#000';
               e.currentTarget.style.textDecoration = 'underline';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#6b7280';
+              e.currentTarget.style.color = '#000';
               e.currentTarget.style.textDecoration = 'none';
             }}
           >
