@@ -50,8 +50,12 @@ app.get('/', async (req, res) => {
       }
 
       // Create the test user directly
+      const crypto = require('crypto');
+      const userId = crypto.randomUUID();
+      
       const testUser = await prisma.user.create({
         data: {
+          userId: userId,
           username: 'testuser',
           email: 'test@camplots.com',
           passwordHash: await bcrypt.hash('password123', 10),
@@ -78,21 +82,75 @@ app.get('/', async (req, res) => {
   // Check if migrate=true query parameter is present
   if (req.query.migrate === 'true') {
     try {
-      const { execSync } = require('child_process');
-      console.log('Running database migrations...');
-      const output = execSync('npx prisma migrate deploy', {
-        encoding: 'utf8',
-        cwd: process.cwd(),
-      });
-      console.log('Migration output:', output);
+      const { default: prisma } = await import('./db');
+      console.log('Creating database tables manually...');
+      
+      // Create User table
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "User" (
+          "userId" TEXT NOT NULL PRIMARY KEY,
+          "username" TEXT NOT NULL,
+          "email" TEXT NOT NULL UNIQUE,
+          "passwordHash" TEXT NOT NULL,
+          "subscriptionType" TEXT NOT NULL DEFAULT 'Basic',
+          "resetToken" TEXT,
+          "resetTokenExpiry" TIMESTAMP(3),
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      
+      // Create Host table
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "Host" (
+          "hostId" TEXT NOT NULL PRIMARY KEY,
+          "name" TEXT NOT NULL,
+          "type" TEXT NOT NULL,
+          "location" JSONB NOT NULL,
+          "amenities" TEXT[],
+          "image" TEXT,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      
+      // Create Booking table
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "Booking" (
+          "bookingId" TEXT NOT NULL PRIMARY KEY,
+          "userId" TEXT NOT NULL,
+          "hostId" TEXT NOT NULL,
+          "dates" JSONB NOT NULL,
+          "status" TEXT NOT NULL DEFAULT 'pending',
+          "totalAmount" DOUBLE PRECISION NOT NULL,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      
+      // Create Payment table
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "Payment" (
+          "paymentId" TEXT NOT NULL PRIMARY KEY,
+          "bookingId" TEXT NOT NULL,
+          "amount" DOUBLE PRECISION NOT NULL,
+          "status" TEXT NOT NULL DEFAULT 'pending',
+          "method" TEXT NOT NULL,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      
+      console.log('Database tables created successfully');
       return res.json({
         success: true,
-        message: 'Database migrations completed successfully',
-        output: output,
+        message: 'Database tables created successfully',
+        tables: ['User', 'Host', 'Booking', 'Payment'],
         nextStep: 'Now visit /?setup=true to create test user',
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
+      console.error('Table creation failed:', error);
       return res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
