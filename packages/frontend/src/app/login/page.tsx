@@ -269,16 +269,59 @@ const LoginPage = () => {
             onClick={async () => {
               console.log('⚙️ Testing apiClient...');
               console.log('⚙️ Base URL:', apiClient.defaults.baseURL);
+              console.log('⚙️ Full apiClient config:', {
+                baseURL: apiClient.defaults.baseURL,
+                headers: apiClient.defaults.headers,
+                timeout: apiClient.defaults.timeout
+              });
+              console.log('⚙️ Environment vars:', {
+                NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+                NODE_ENV: process.env.NODE_ENV
+              });
+              
               try {
+                console.log('⚙️ Making apiClient request...');
                 const response = await apiClient.post('/users/login', {
                   email: 'test@camplots.com',
                   password: 'password123',
                 });
-                console.log('⚙️ ApiClient response:', response.status);
+                console.log('⚙️ ApiClient response:', {
+                  status: response.status,
+                  statusText: response.statusText,
+                  data: response.data,
+                  headers: response.headers
+                });
                 toast.success('ApiClient test successful!');
-              } catch (err) {
-                console.error('⚙️ ApiClient error:', err);
-                toast.error('ApiClient test failed!');
+              } catch (err: unknown) {
+                const axiosError = err as {
+                  message?: string;
+                  code?: string;
+                  response?: {
+                    status?: number;
+                    statusText?: string;
+                    data?: unknown;
+                  };
+                  config?: {
+                    url?: string;
+                    baseURL?: string;
+                    method?: string;
+                    headers?: unknown;
+                  };
+                };
+                console.error('⚙️ ApiClient error details:', {
+                  message: axiosError.message,
+                  code: axiosError.code,
+                  status: axiosError.response?.status,
+                  statusText: axiosError.response?.statusText,
+                  data: axiosError.response?.data,
+                  config: {
+                    url: axiosError.config?.url,
+                    baseURL: axiosError.config?.baseURL,
+                    method: axiosError.config?.method,
+                    headers: axiosError.config?.headers
+                  }
+                });
+                toast.error(`ApiClient failed: ${axiosError.message || 'Unknown error'}`);
               }
             }}
             style={{
