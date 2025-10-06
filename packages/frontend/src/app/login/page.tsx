@@ -23,12 +23,12 @@ const LoginPage = () => {
     console.log('📍 API Base URL:', apiClient.defaults.baseURL);
     console.log('📧 Email:', data.email);
     console.log('🌐 Environment:', process.env.NODE_ENV);
-    
+
     try {
       console.log('🚀 Sending login request...');
       const response = await apiClient.post('/users/login', data);
       console.log('✅ Login response received:', response.status);
-      
+
       dispatch(setToken(response.data.token));
       toast.success('Login successful!');
       router.push('/dashboard');
@@ -46,7 +46,7 @@ const LoginPage = () => {
           method?: string;
         };
       };
-      
+
       console.error('❌ Login error details:', {
         message: axiosError.message,
         status: axiosError.response?.status,
@@ -55,14 +55,15 @@ const LoginPage = () => {
         config: {
           url: axiosError.config?.url,
           baseURL: axiosError.config?.baseURL,
-          method: axiosError.config?.method
-        }
+          method: axiosError.config?.method,
+        },
       });
-      
-      const errorMessage = axiosError.response?.data?.message || 
-                          axiosError.message || 
-                          'Login failed. Please check your credentials.';
-      
+
+      const errorMessage =
+        axiosError.response?.data?.message ||
+        axiosError.message ||
+        'Login failed. Please check your credentials.';
+
       toast.error(errorMessage);
     }
   };
