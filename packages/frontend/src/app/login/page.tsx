@@ -220,6 +220,71 @@ const LoginPage = () => {
           Login
         </button>
 
+        {/* Quick Debug Tests */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+          <button
+            type="button"
+            onClick={async () => {
+              console.log('🧪 Testing direct API call...');
+              try {
+                const response = await fetch('https://camplots-backend.onrender.com/api/v1/users/login', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: 'test@camplots.com', password: 'password123' })
+                });
+                console.log('🧪 Direct fetch response:', response.status, response.statusText);
+                const data = await response.json();
+                console.log('🧪 Direct fetch data:', data);
+                toast.success('Direct API test successful!');
+              } catch (err) {
+                console.error('🧪 Direct fetch error:', err);
+                toast.error('Direct API test failed!');
+              }
+            }}
+            style={{
+              flex: 1,
+              padding: '8px',
+              backgroundColor: '#7c3aed',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '12px'
+            }}
+          >
+            🧪 Direct
+          </button>
+          
+          <button
+            type="button"
+            onClick={async () => {
+              console.log('⚙️ Testing apiClient...');
+              console.log('⚙️ Base URL:', apiClient.defaults.baseURL);
+              try {
+                const response = await apiClient.post('/users/login', {
+                  email: 'test@camplots.com',
+                  password: 'password123'
+                });
+                console.log('⚙️ ApiClient response:', response.status);
+                toast.success('ApiClient test successful!');
+              } catch (err) {
+                console.error('⚙️ ApiClient error:', err);
+                toast.error('ApiClient test failed!');
+              }
+            }}
+            style={{
+              flex: 1,
+              padding: '8px',
+              backgroundColor: '#10b981',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '12px'
+            }}
+          >
+            ⚙️ ApiClient
+          </button>
+        </div>
+
         <div
           style={{
             marginTop: '16px',
