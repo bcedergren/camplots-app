@@ -4,13 +4,19 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
 export const registerUser = async (userData: any): Promise<any> => {
-  const { email, password, username } = userData;
+  const { email, password, username, role } = userData;
   const passwordHash = await bcrypt.hash(password, 10);
+  // Only allow USER or HOST roles via registration
+  let safeRole = 'USER';
+  if (role && (role === 'HOST' || role === 'USER')) {
+    safeRole = role;
+  }
   const user = await prisma.user.create({
     data: {
       email,
       passwordHash,
       username,
+      role: safeRole,
     },
   });
   return user;

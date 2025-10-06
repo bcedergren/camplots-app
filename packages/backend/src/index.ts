@@ -227,7 +227,10 @@ app.get('/', async (req, res) => {
     try {
       console.log('Attempting to import seed module...');
       const seedModule = await import('./seed');
-      console.log('Seed module imported successfully:', Object.keys(seedModule));
+      console.log(
+        'Seed module imported successfully:',
+        Object.keys(seedModule)
+      );
       const { seedUsers, seedHosts } = seedModule;
 
       let results = {

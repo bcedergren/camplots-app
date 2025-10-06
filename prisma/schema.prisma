@@ -21,10 +21,17 @@ model User {
   email          String   @unique
   passwordHash   String
   subscriptionType String   @default("Free")
+  role           Role     @default(USER)
   resetToken     String?
   resetTokenExpiry DateTime?
   createdAt      DateTime @default(now())
   bookings       Booking[]
+}
+
+enum Role {
+  ADMIN
+  HOST
+  USER
 }
 
 model Host {
