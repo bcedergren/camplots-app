@@ -225,7 +225,10 @@ app.get('/', async (req, res) => {
   // Check if seed=true query parameter is present
   if (req.query.seed === 'true') {
     try {
-      const { seedUsers, seedHosts } = await import('./seed');
+      console.log('Attempting to import seed module...');
+      const seedModule = await import('./seed');
+      console.log('Seed module imported successfully:', Object.keys(seedModule));
+      const { seedUsers, seedHosts } = seedModule;
 
       let results = {
         step: 'seed',
@@ -269,10 +272,13 @@ app.get('/', async (req, res) => {
 
       return res.json(results);
     } catch (error) {
+      console.error('Seeding endpoint error:', error);
       return res.json({
         step: 'seed',
         success: false,
         error: error instanceof Error ? error.message : 'Unknown seeding error',
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
       });
     }
   }
