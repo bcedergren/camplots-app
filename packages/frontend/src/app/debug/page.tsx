@@ -4,9 +4,27 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import apiClient from '@/lib/api';
 
+interface DebugResponse {
+  status: number;
+  statusText: string;
+  data?: unknown;
+  headers?: unknown;
+  body?: string;
+}
+
+interface DebugError {
+  message: string;
+  response?: {
+    status: number;
+    statusText: string;
+    data: unknown;
+  } | null;
+  type?: string;
+}
+
 const DebugPage = () => {
-  const [response, setResponse] = useState<any>(null);
-  const [error, setError] = useState<any>(null);
+  const [response, setResponse] = useState<DebugResponse | null>(null);
+  const [error, setError] = useState<DebugError | null>(null);
   const [loading, setLoading] = useState(false);
 
   const testBackendConnection = async () => {
@@ -28,7 +46,9 @@ const DebugPage = () => {
 
       toast.success('Backend connection successful!');
     } catch (err) {
-      setError(err);
+      setError({
+        message: err instanceof Error ? err.message : 'Unknown error',
+      });
       toast.error('Backend connection failed!');
     } finally {
       setLoading(false);
@@ -57,15 +77,19 @@ const DebugPage = () => {
       });
 
       toast.success('Login test successful!');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Login test error:', err);
+      const errorObj = err as {
+        message?: string;
+        response?: { status: number; statusText: string; data: unknown };
+      };
       setError({
-        message: err.message,
-        response: err.response
+        message: errorObj.message || 'Unknown error',
+        response: errorObj.response
           ? {
-              status: err.response.status,
-              statusText: err.response.statusText,
-              data: err.response.data,
+              status: errorObj.response.status,
+              statusText: errorObj.response.statusText,
+              data: errorObj.response.data,
             }
           : null,
       });
@@ -109,9 +133,9 @@ const DebugPage = () => {
       });
 
       toast.success('Direct fetch login successful!');
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError({
-        message: err.message,
+        message: err instanceof Error ? err.message : 'Unknown error',
         type: 'Direct fetch error',
       });
       toast.error('Direct fetch login failed!');
