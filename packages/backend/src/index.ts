@@ -222,6 +222,61 @@ app.get('/', async (req, res) => {
     }
   }
 
+  // Check if seed=true query parameter is present
+  if (req.query.seed === 'true') {
+    try {
+      const { seedUsers, seedHosts } = await import('./seed');
+
+      let results = {
+        step: 'seed',
+        users: { created: 0, skipped: 0, errors: [] },
+        hosts: { created: 0, skipped: 0, errors: [] },
+        success: false,
+        message: '',
+      };
+
+      // Seed users
+      try {
+        const userResult = await seedUsers();
+        results.users = {
+          created: userResult.created || 0,
+          skipped: userResult.skipped || 0,
+          errors: userResult.errors || [],
+        };
+      } catch (error) {
+        results.users.errors.push(
+          error instanceof Error ? error.message : 'Unknown user seeding error'
+        );
+      }
+
+      // Seed hosts
+      try {
+        const hostResult = await seedHosts();
+        results.hosts = {
+          created: hostResult.created || 0,
+          skipped: hostResult.skipped || 0,
+          errors: hostResult.errors || [],
+        };
+      } catch (error) {
+        results.hosts.errors.push(
+          error instanceof Error ? error.message : 'Unknown host seeding error'
+        );
+      }
+
+      results.success =
+        results.users.errors.length === 0 && results.hosts.errors.length === 0;
+      results.message = `Database seeded successfully! Created ${results.users.created} users and ${results.hosts.created} campsites.`;
+
+      return res.json(results);
+    } catch (error) {
+      return res.json({
+        step: 'seed',
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown seeding error',
+      });
+    }
+  }
+
   // Check if debug=true query parameter is present
   if (req.query.debug === 'true') {
     try {
@@ -337,6 +392,7 @@ app.get('/', async (req, res) => {
         <p><strong>Step 2:</strong> <a href="/?setup=true" class="button">👤 Create Test User</a></p>
         <p><strong>Debug:</strong> <a href="/?debug=true" class="button">🔍 Check Database Status</a></p>
         <p><strong>Test Login:</strong> <a href="/?testLogin=true" class="button">🔐 Test Login Flow</a></p>
+        <p><strong>Seed Database:</strong> <a href="/?seed=true" class="button">🌱 Add Test Campsites</a></p>
       </div>
       
       <div class="credentials">
