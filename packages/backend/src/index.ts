@@ -33,22 +33,22 @@ app.get('/', async (req, res) => {
     try {
       const { default: prisma } = await import('./db');
       const bcrypt = require('bcryptjs');
-      
+
       // Check if user already exists
       const existingUser = await prisma.user.findUnique({
-        where: { email: 'test@camplots.com' }
+        where: { email: 'test@camplots.com' },
       });
-      
+
       if (existingUser) {
         return res.json({
           message: 'Test user already exists!',
           email: 'test@camplots.com',
           password: 'password123',
           status: 'ready for login',
-          instructions: 'You can now login with these credentials'
+          instructions: 'You can now login with these credentials',
         });
       }
-      
+
       // Create the test user directly
       const testUser = await prisma.user.create({
         data: {
@@ -58,24 +58,23 @@ app.get('/', async (req, res) => {
           subscriptionType: 'Premium',
         },
       });
-      
+
       return res.json({
         message: 'Test user created successfully!',
         email: 'test@camplots.com',
         password: 'password123',
         status: 'ready for login',
         userId: testUser.userId,
-        instructions: 'You can now login with these credentials'
+        instructions: 'You can now login with these credentials',
       });
-      
     } catch (error) {
       return res.status(500).json({
         error: error instanceof Error ? error.message : 'Unknown error',
-        hint: 'Database tables might not exist yet. Try visiting /?migrate=true first'
+        hint: 'Database tables might not exist yet. Try visiting /?migrate=true first',
       });
     }
   }
-  
+
   // Check if migrate=true query parameter is present
   if (req.query.migrate === 'true') {
     try {
@@ -101,27 +100,61 @@ app.get('/', async (req, res) => {
       });
     }
   }
-  
+
   // Default response with instructions
+  res.setHeader('Content-Type', 'text/html');
   res.send(`
-    <h1>CampLots Backend API</h1>
-    <p>Backend is running successfully!</p>
-    <h2>Setup Instructions:</h2>
-    <ol>
-      <li><strong>Step 1:</strong> <a href="/?migrate=true">Run Database Migration</a></li>
-      <li><strong>Step 2:</strong> <a href="/?setup=true">Create Test User</a></li>
-    </ol>
-    <h2>Test Credentials:</h2>
-    <ul>
-      <li><strong>Email:</strong> test@camplots.com</li>
-      <li><strong>Password:</strong> password123</li>
-    </ul>
-    <h2>API Endpoints:</h2>
-    <ul>
-      <li><a href="/health">Health Check</a></li>
-      <li>POST /api/v1/users/login - Login endpoint</li>
-      <li>POST /api/v1/users/register - Registration endpoint</li>
-    </ul>
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>CampLots Backend API</title>
+      <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .step { background: #f0f8ff; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .credentials { background: #f0fff0; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        a { color: #0066cc; text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; }
+        .button { 
+          display: inline-block; 
+          background: #007cba; 
+          color: white; 
+          padding: 10px 20px; 
+          margin: 5px; 
+          border-radius: 5px; 
+          text-decoration: none; 
+        }
+        .button:hover { background: #005a87; }
+      </style>
+    </head>
+    <body>
+      <h1>🏕️ CampLots Backend API</h1>
+      <p>✅ Backend is running successfully!</p>
+      
+      <div class="step">
+        <h2>📋 Setup Instructions:</h2>
+        <p><strong>Step 1:</strong> <a href="/?migrate=true" class="button">🔧 Run Database Migration</a></p>
+        <p><strong>Step 2:</strong> <a href="/?setup=true" class="button">👤 Create Test User</a></p>
+      </div>
+      
+      <div class="credentials">
+        <h2>🔑 Test Credentials:</h2>
+        <ul>
+          <li><strong>Email:</strong> test@camplots.com</li>
+          <li><strong>Password:</strong> password123</li>
+        </ul>
+      </div>
+      
+      <h2>🔗 API Endpoints:</h2>
+      <ul>
+        <li><a href="/health">Health Check</a></li>
+        <li><a href="/debug/users">Debug: View Users</a></li>
+        <li>POST /api/v1/users/login - Login endpoint</li>
+        <li>POST /api/v1/users/register - Registration endpoint</li>
+      </ul>
+      
+      <p><em>Note: Complete both setup steps above, then try logging in with the test credentials!</em></p>
+    </body>
+    </html>
   `);
 });
 
@@ -130,21 +163,21 @@ app.get('/create-test-user', async (req, res) => {
   try {
     const { default: prisma } = await import('./db');
     const bcrypt = require('bcryptjs');
-    
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email: 'test@camplots.com' }
+      where: { email: 'test@camplots.com' },
     });
-    
+
     if (existingUser) {
       return res.json({
         message: 'Test user already exists!',
         email: 'test@camplots.com',
         password: 'password123',
-        status: 'ready for login'
+        status: 'ready for login',
       });
     }
-    
+
     // Create the test user directly
     const testUser = await prisma.user.create({
       data: {
@@ -154,19 +187,18 @@ app.get('/create-test-user', async (req, res) => {
         subscriptionType: 'Premium',
       },
     });
-    
+
     res.json({
       message: 'Test user created successfully!',
       email: 'test@camplots.com',
       password: 'password123',
       status: 'ready for login',
-      userId: testUser.userId
+      userId: testUser.userId,
     });
-    
   } catch (error) {
     res.status(500).json({
       error: error instanceof Error ? error.message : 'Unknown error',
-      hint: 'Database tables might not exist yet'
+      hint: 'Database tables might not exist yet',
     });
   }
 });
