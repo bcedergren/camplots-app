@@ -272,13 +272,13 @@ const LoginPage = () => {
               console.log('⚙️ Full apiClient config:', {
                 baseURL: apiClient.defaults.baseURL,
                 headers: apiClient.defaults.headers,
-                timeout: apiClient.defaults.timeout
+                timeout: apiClient.defaults.timeout,
               });
               console.log('⚙️ Environment vars:', {
                 NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-                NODE_ENV: process.env.NODE_ENV
+                NODE_ENV: process.env.NODE_ENV,
               });
-              
+
               try {
                 console.log('⚙️ Making apiClient request...');
                 const response = await apiClient.post('/users/login', {
@@ -289,7 +289,7 @@ const LoginPage = () => {
                   status: response.status,
                   statusText: response.statusText,
                   data: response.data,
-                  headers: response.headers
+                  headers: response.headers,
                 });
                 toast.success('ApiClient test successful!');
               } catch (err: unknown) {
@@ -318,10 +318,12 @@ const LoginPage = () => {
                     url: axiosError.config?.url,
                     baseURL: axiosError.config?.baseURL,
                     method: axiosError.config?.method,
-                    headers: axiosError.config?.headers
-                  }
+                    headers: axiosError.config?.headers,
+                  },
                 });
-                toast.error(`ApiClient failed: ${axiosError.message || 'Unknown error'}`);
+                toast.error(
+                  `ApiClient failed: ${axiosError.message || 'Unknown error'}`
+                );
               }
             }}
             style={{
