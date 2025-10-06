@@ -227,12 +227,22 @@ const LoginPage = () => {
             onClick={async () => {
               console.log('🧪 Testing direct API call...');
               try {
-                const response = await fetch('https://camplots-backend.onrender.com/api/v1/users/login', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ email: 'test@camplots.com', password: 'password123' })
-                });
-                console.log('🧪 Direct fetch response:', response.status, response.statusText);
+                const response = await fetch(
+                  'https://camplots-backend.onrender.com/api/v1/users/login',
+                  {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      email: 'test@camplots.com',
+                      password: 'password123',
+                    }),
+                  }
+                );
+                console.log(
+                  '🧪 Direct fetch response:',
+                  response.status,
+                  response.statusText
+                );
                 const data = await response.json();
                 console.log('🧪 Direct fetch data:', data);
                 toast.success('Direct API test successful!');
@@ -248,12 +258,12 @@ const LoginPage = () => {
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              fontSize: '12px'
+              fontSize: '12px',
             }}
           >
             🧪 Direct
           </button>
-          
+
           <button
             type="button"
             onClick={async () => {
@@ -262,7 +272,7 @@ const LoginPage = () => {
               try {
                 const response = await apiClient.post('/users/login', {
                   email: 'test@camplots.com',
-                  password: 'password123'
+                  password: 'password123',
                 });
                 console.log('⚙️ ApiClient response:', response.status);
                 toast.success('ApiClient test successful!');
@@ -278,7 +288,7 @@ const LoginPage = () => {
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              fontSize: '12px'
+              fontSize: '12px',
             }}
           >
             ⚙️ ApiClient
