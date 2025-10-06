@@ -10,10 +10,13 @@ interface RegisterFormData {
   username: string;
   email: string;
   password: string;
+  role: 'HOST' | 'USER';
 }
 
 const RegisterPage = () => {
-  const { register, handleSubmit } = useForm<RegisterFormData>();
+  const { register, handleSubmit } = useForm<RegisterFormData>({
+    defaultValues: { role: 'USER' },
+  });
   const router = useRouter();
 
   const onSubmit = async (data: RegisterFormData) => {
@@ -86,6 +89,43 @@ const RegisterPage = () => {
               color: '#111827',
             }}
           />
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '4px',
+              fontWeight: '500',
+              color: '#111827',
+            }}
+          >
+            Account Type
+          </label>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <label
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <input
+                type="radio"
+                value="USER"
+                {...register('role', { required: true })}
+                style={{ accentColor: '#3182ce' }}
+              />
+              User
+            </label>
+            <label
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <input
+                type="radio"
+                value="HOST"
+                {...register('role', { required: true })}
+                style={{ accentColor: '#3182ce' }}
+              />
+              Host
+            </label>
+          </div>
         </div>
 
         <div>
