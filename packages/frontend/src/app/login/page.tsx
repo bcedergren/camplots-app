@@ -19,14 +19,51 @@ const LoginPage = () => {
   const dispatch = useDispatch();
 
   const onSubmit = async (data: LoginFormData) => {
+    console.log('🔐 Login attempt started');
+    console.log('📍 API Base URL:', apiClient.defaults.baseURL);
+    console.log('📧 Email:', data.email);
+    console.log('🌐 Environment:', process.env.NODE_ENV);
+    
     try {
+      console.log('🚀 Sending login request...');
       const response = await apiClient.post('/users/login', data);
+      console.log('✅ Login response received:', response.status);
+      
       dispatch(setToken(response.data.token));
       toast.success('Login successful!');
       router.push('/dashboard');
-    } catch (error) {
-      console.error(error);
-      toast.error('Login failed. Please check your credentials.');
+    } catch (error: unknown) {
+      const axiosError = error as {
+        message?: string;
+        response?: {
+          status?: number;
+          statusText?: string;
+          data?: { message?: string };
+        };
+        config?: {
+          url?: string;
+          baseURL?: string;
+          method?: string;
+        };
+      };
+      
+      console.error('❌ Login error details:', {
+        message: axiosError.message,
+        status: axiosError.response?.status,
+        statusText: axiosError.response?.statusText,
+        data: axiosError.response?.data,
+        config: {
+          url: axiosError.config?.url,
+          baseURL: axiosError.config?.baseURL,
+          method: axiosError.config?.method
+        }
+      });
+      
+      const errorMessage = axiosError.response?.data?.message || 
+                          axiosError.message || 
+                          'Login failed. Please check your credentials.';
+      
+      toast.error(errorMessage);
     }
   };
 
