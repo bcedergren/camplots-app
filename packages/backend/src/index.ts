@@ -52,7 +52,7 @@ app.get('/', async (req, res) => {
       // Create the test user directly
       const crypto = require('crypto');
       const userId = crypto.randomUUID();
-      
+
       const testUser = await prisma.user.create({
         data: {
           userId: userId,
@@ -84,7 +84,7 @@ app.get('/', async (req, res) => {
     try {
       const { default: prisma } = await import('./db');
       console.log('Creating database tables manually...');
-      
+
       // Create User table
       await prisma.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS "User" (
@@ -99,7 +99,7 @@ app.get('/', async (req, res) => {
           "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
       `);
-      
+
       // Create Host table
       await prisma.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS "Host" (
@@ -113,7 +113,7 @@ app.get('/', async (req, res) => {
           "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
       `);
-      
+
       // Create Booking table
       await prisma.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS "Booking" (
@@ -127,7 +127,7 @@ app.get('/', async (req, res) => {
           "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
       `);
-      
+
       // Create Payment table
       await prisma.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS "Payment" (
@@ -140,7 +140,7 @@ app.get('/', async (req, res) => {
           "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
       `);
-      
+
       console.log('Database tables created successfully');
       return res.json({
         success: true,
