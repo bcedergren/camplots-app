@@ -158,7 +158,58 @@ app.get('/', async (req, res) => {
       });
     }
   }
-
+  
+  // Check if debug=true query parameter is present
+  if (req.query.debug === 'true') {
+    try {
+      const { default: prisma } = await import('./db');
+      
+      // Check if tables exist
+      const tableCheck = await prisma.$queryRaw`
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name IN ('User', 'Host', 'Booking', 'Payment')
+      `;
+      
+      // Count users
+      let userCount = 0;
+      let users = [];
+      try {
+        userCount = await prisma.user.count();
+        users = await prisma.user.findMany({
+          select: {
+            userId: true,
+            email: true,
+            username: true,
+            subscriptionType: true,
+            createdAt: true,
+          },
+        });
+      } catch (e) {
+        console.log('User table might not exist yet');
+      }
+      
+      return res.json({
+        database: 'connected',
+        tables: tableCheck,
+        userCount: userCount,
+        users: users,
+        testUserExists: users.some(u => u.email === 'test@camplots.com'),
+        environment: {
+          NODE_ENV: process.env.NODE_ENV,
+          JWT_SECRET: process.env.JWT_SECRET ? 'Set' : 'Not set',
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+  
   // Default response with instructions
   res.setHeader('Content-Type', 'text/html');
   res.send(`
@@ -192,6 +243,7 @@ app.get('/', async (req, res) => {
         <h2>📋 Setup Instructions:</h2>
         <p><strong>Step 1:</strong> <a href="/?migrate=true" class="button">🔧 Run Database Migration</a></p>
         <p><strong>Step 2:</strong> <a href="/?setup=true" class="button">👤 Create Test User</a></p>
+        <p><strong>Debug:</strong> <a href="/?debug=true" class="button">🔍 Check Database Status</a></p>
       </div>
       
       <div class="credentials">
