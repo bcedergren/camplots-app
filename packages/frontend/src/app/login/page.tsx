@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
+import toast from 'react-hot-toast';
 import { setToken } from '@/store/features/auth/authSlice';
 import apiClient from '@/lib/api';
 import Link from 'next/link';
@@ -21,11 +22,11 @@ const LoginPage = () => {
     try {
       const response = await apiClient.post('/users/login', data);
       dispatch(setToken(response.data.token));
-      alert('Login successful!');
+      toast.success('Login successful!');
       router.push('/dashboard');
     } catch (error) {
       console.error(error);
-      alert('Login failed. Please check your credentials.');
+      toast.error('Login failed. Please check your credentials.');
     }
   };
 

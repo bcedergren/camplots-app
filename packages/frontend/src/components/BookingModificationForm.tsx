@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import apiClient from '@/lib/api';
 
 interface Booking {
@@ -121,7 +122,7 @@ const BookingModificationForm = ({
 
       await apiClient.put(`/bookings/${booking.bookingId}`, modificationData);
 
-      alert(
+      toast.success(
         'Booking updated successfully! You will receive a confirmation email.'
       );
       onSuccess?.();

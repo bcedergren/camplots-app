@@ -2,6 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import Link from 'next/link';
 import apiClient from '@/lib/api';
 
@@ -17,9 +18,10 @@ const ForgotPasswordPage = () => {
     try {
       await apiClient.post('/users/forgot-password', data);
       setIsSubmitted(true);
+      toast.success('Reset instructions sent to your email!');
     } catch (error) {
       console.error(error);
-      alert('Failed to send reset email. Please try again.');
+      toast.error('Failed to send reset email. Please try again.');
     }
   };
 

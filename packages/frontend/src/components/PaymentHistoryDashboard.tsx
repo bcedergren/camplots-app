@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import apiClient from '@/lib/api';
 
 interface Payment {
@@ -70,7 +71,7 @@ const PaymentHistoryDashboard = () => {
 
   const handleRefund = async () => {
     if (!selectedPayment || !refundReason.trim()) {
-      alert('Please provide a refund reason');
+      toast.error('Please provide a refund reason');
       return;
     }
 
@@ -80,7 +81,7 @@ const PaymentHistoryDashboard = () => {
         reason: refundReason,
       });
 
-      alert(
+      toast.success(
         'Refund processed successfully! A confirmation email has been sent.'
       );
       setShowRefundModal(false);
@@ -89,7 +90,7 @@ const PaymentHistoryDashboard = () => {
       fetchPaymentData(); // Refresh data
     } catch (err: unknown) {
       console.error('Error processing refund:', err);
-      alert('Failed to process refund. Please try again.');
+      toast.error('Failed to process refund. Please try again.');
     } finally {
       setRefunding(false);
     }

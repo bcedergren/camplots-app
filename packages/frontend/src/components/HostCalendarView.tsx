@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import toast from 'react-hot-toast';
 import apiClient from '@/lib/api';
 
 interface Booking {
@@ -139,7 +140,7 @@ const HostCalendarView = () => {
 
   const handleCreateBooking = async () => {
     if (!bookingForm.checkIn || !bookingForm.checkOut) {
-      alert('Please select check-in and check-out dates');
+      toast.error('Please select check-in and check-out dates');
       return;
     }
 
@@ -159,7 +160,7 @@ const HostCalendarView = () => {
 
       await apiClient.post('/bookings', newBooking);
 
-      alert(
+      toast.success(
         'Booking created successfully! You will receive a confirmation email.'
       );
       setShowBookingModal(false);
@@ -172,7 +173,7 @@ const HostCalendarView = () => {
       setBookings(response.data);
     } catch (err: unknown) {
       console.error('Error creating booking:', err);
-      alert('Failed to create booking. Please try again.');
+      toast.error('Failed to create booking. Please try again.');
     } finally {
       setCreatingBooking(false);
     }

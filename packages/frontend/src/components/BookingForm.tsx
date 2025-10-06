@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import apiClient from '@/lib/api';
 import { RootState } from '@/store';
 
@@ -127,7 +128,7 @@ const BookingForm = ({
 
       await apiClient.post('/bookings', bookingData);
 
-      alert(
+      toast.success(
         'Booking request submitted successfully! You will receive a confirmation email shortly.'
       );
       onBookingSuccess?.();

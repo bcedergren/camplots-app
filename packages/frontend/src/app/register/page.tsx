@@ -2,6 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import apiClient from '@/lib/api';
 import Link from 'next/link';
 
@@ -18,11 +19,11 @@ const RegisterPage = () => {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       await apiClient.post('/users/register', data);
-      alert('Registration successful! You can now log in.');
+      toast.success('Registration successful! You can now log in.');
       router.push('/login');
     } catch (error) {
       console.error(error);
-      alert('Registration failed. Please try again.');
+      toast.error('Registration failed. Please try again.');
     }
   };
 
