@@ -1,13 +1,17 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 import userRoutes from './routes/userRoutes';
 import hostRoutes from './routes/hostRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import paymentRoutes from './routes/paymentRoutes';
 
-dotenv.config();
-
+const envPath = path.resolve(__dirname, '../../../.env');
+console.log('Resolved .env path:', envPath);
+console.log('.env exists:', fs.existsSync(envPath));
+dotenv.config({ path: envPath });
 const app = express();
 const port = process.env.PORT || 8000;
 

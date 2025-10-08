@@ -31,7 +31,7 @@ const Footer = () => {
           {/* Company Info */}
           <div>
             <Image
-              src="/logo.png"
+              src="/logo-footer.png"
               alt="CampLots Logo"
               width={150}
               height={50}

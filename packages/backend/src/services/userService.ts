@@ -16,7 +16,6 @@ export const registerUser = async (userData: any): Promise<any> => {
       email,
       passwordHash,
       username,
-      role: safeRole,
     },
   });
   return user;
